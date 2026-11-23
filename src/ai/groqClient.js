@@ -1,4 +1,6 @@
 import Groq from 'groq-sdk';
+import { DEFAULT_SERVICE_URL } from './serviceConfig.js';
+import { validateServiceUrl } from './sharedClient.js';
 import { evaluationSchema, matchesSchema } from './schemas.js';
 import { aiInstructions } from './aiInstructions.js';
 
@@ -17,16 +19,21 @@ export function safeAIError(error) {
 }
 export function configureAI(options = {}) {
   if (!options || typeof options !== 'object' || Array.isArray(options) || ![Object.prototype, null].includes(Object.getPrototypeOf(options))) throw new TypeError('AI options must be a plain object.');
-  const allowed = ['apiKey', 'provider', 'model', 'timeoutMs', 'fallback', 'offlineOptions', 'responseFormat'];
+  const allowed = ['apiKey', 'provider', 'model', 'timeoutMs', 'fallback', 'offlineOptions', 'responseFormat', 'serviceUrl'];
   if (Object.keys(options).some(key => !allowed.includes(key))) throw new TypeError('Unknown AI option.');
   if (options.provider !== undefined && options.provider !== 'groq') throw new TypeError('Only the groq provider is supported.');
   const model = options.model ?? DEFAULT_MODEL;
   if (typeof model !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9/_.-]{0,149}$/.test(model)) throw new TypeError('model must be a valid model identifier.');
-  const timeoutMs = options.timeoutMs ?? 30000;
+  const endpoint = options.serviceUrl ?? (options.apiKey !== undefined ? '' : (process.env.PROMPTLINT_SERVICE_URL ?? DEFAULT_SERVICE_URL));
+  const serviceUrl = endpoint ? validateServiceUrl(endpoint) : '';
+  if (serviceUrl && options.apiKey !== undefined) throw new TypeError('Choose serviceUrl or apiKey, not both.');
+  if (serviceUrl && (options.model !== undefined || options.responseFormat !== undefined)) throw new TypeError('The shared service controls its model and response format.');
+  const timeoutMs = options.timeoutMs ?? (serviceUrl ? 120000 : 30000);
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 300000) throw new TypeError('timeoutMs must be an integer from 1 to 300000.');
   if (options.fallback !== undefined && typeof options.fallback !== 'boolean') throw new TypeError('fallback must be boolean.');
   const responseFormat = options.responseFormat ?? 'auto';
   if (!['auto', 'json_schema', 'json_object'].includes(responseFormat)) throw new TypeError('Invalid responseFormat.');
+  if (serviceUrl) return { serviceUrl, timeoutMs, fallback: options.fallback ?? true, offlineOptions: options.offlineOptions };
   const apiKey = options.apiKey ?? process.env.GROQ_API_KEY;
   if (typeof apiKey !== 'string' || !apiKey.trim()) throw new AIError('MISSING_KEY', 'AI mode requires GROQ_API_KEY. Set it in your environment, or pass apiKey in trusted server-side JavaScript. Use --offline without a key.');
   return { model, timeoutMs, responseFormat, apiKey: apiKey.trim(), fallback: options.fallback ?? true, offlineOptions: options.offlineOptions };
@@ -49,7 +56,7 @@ export async function requestEvaluation(prompt, settings, clientFactory = create
         { role: 'user', content: prompt }],
       response_format: useSchema ? { type: 'json_schema', json_schema: { name: 'prompt_evaluation', strict: true, schema: evaluationSchema } }
         : { type: 'json_object' },
-      max_completion_tokens: 8192
+      max_completion_tokens: settings.maxCompletionTokens ?? 8192
     }, { signal: controller.signal });
     const deadline = new Promise((_, reject) => {
       timer = setTimeout(() => {

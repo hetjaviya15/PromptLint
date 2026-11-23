@@ -47,6 +47,42 @@ Score deductions: vague-language -15, missing-context -15
 
 Normal Unicode terminals show titled rounded panels, compact findings, and Unicode score bars. Reports avoid repeating suggestions already shown with findings. Small terminals switch to compact output; `--ascii` provides a plain character fallback. Colors are disabled for redirected output, `NO_COLOR`, or `--no-color`. AI spinners run only on a suitable TTY and never in JSON mode.
 
+## Shared Online access on Render (owner setup)
+
+Regular users can use Online mode without a Groq key once the owner deploys this backend and embeds its public URL in the npm package. The key stays in Render's server environment. No Docker, database, or changes to SIFRA are required.
+
+**Current state:** the backend implementation is ready; no public PromptLint service URL has been configured yet. Until you deploy it, direct mode still uses your local Groq key.
+
+1. Commit and push this repository when ready. In Render, choose **New → Blueprint** and connect `hetjaviya15/PromptLint`. The included `render.yaml` selects a native Node.js Free web service.
+2. Enter **your new Groq key** as the server's `GROQ_API_KEY` secret when Render asks. Never commit a real key or place it in the public URL. Rotate any key previously shared in chat before public deployment.
+3. Alternatively, create a **Web Service** manually with runtime **Node**, build command `npm ci --omit=dev`, start command `node server/index.js`, Free instance type, `NODE_VERSION=24`, and health-check path `/health`. Add the same server-side key.
+4. Wait for deployment and open `https://YOUR-SERVICE.onrender.com/health`. A running server returns `{"status":"ok"}`. This verifies server availability, not Groq authentication.
+5. Configure the real public URL in your checkout:
+
+```bash
+npm run configure:server -- https://YOUR-SERVICE.onrender.com
+npm test
+npm pack
+```
+
+Commit the resulting `src/ai/serviceConfig.js` change and publish the rebuilt package manually. The configured URL is public; it contains no credential. Normal users then just run `promptlint-ai`, choose **Online**, and enter a prompt. They do not need `.env` or their own key.
+
+Render's [Free service documentation](https://render.com/docs/free) says services sleep after 15 idle minutes and can take about a minute to wake; free instance hours are shared across your workspace. Two free services do not each receive an independent workspace allowance. Groq usage remains subject to your provider account's limits and charges.
+
+For local owner testing, start `npm run server` in one terminal. In another, run:
+
+```bash
+PROMPTLINT_SERVICE_URL=http://127.0.0.1:3000 npm start
+```
+
+This uses your server's key. Public deployments require HTTPS; plain HTTP is allowed only for loopback development. The server exposes `POST /v1/evaluate` with `{ "prompt": "..." }` and `GET /health`. It never serves local files.
+
+### Shared-service limits
+
+The default single-instance limits are **10 attempts per minute**, **100 attempts per 24-hour window**, **2 concurrent evaluations**, **8000 prompt characters**, and **32 KiB request bodies**. Every Groq attempt, including failures, counts. Response generation is capped at 4096 completion tokens and a 30-second provider deadline. Server environment variables `REQUESTS_PER_MINUTE`, `REQUESTS_PER_DAY`, and `MAX_CONCURRENT` adjust the request limits. Clients cannot change the model, output cap, provider URL, or key.
+
+Limits apply globally to all users, deliberately avoiding trust in spoofable forwarded IP headers. There are no accounts or authentication: someone can exhaust the shared allowance. Counters live in memory and reset on restarts, redeployments, and free-instance sleep. They are demo safeguards, **not a durable billing cap**; use provider-side account limits and monitor usage before wider distribution. Do not scale multiple instances without a shared quota store. Server application code does not log prompts, keys, or raw provider errors; the hosting provider may retain access metadata.
+
 ## Installation
 
 Requires **Node.js 24 or newer** and npm. From the repository:
@@ -116,7 +152,7 @@ Unclear requirements and missing technical details are covered by the contextual
 
 ## Groq AI analysis
 
-Explicitly selecting AI sends the prompt to Groq for processing:
+Explicitly selecting AI sends the prompt through the configured shared service to Groq, or directly to Groq when using your own key:
 
 ```bash
 promptlint-ai analyze "Write good code" --ai
@@ -128,7 +164,9 @@ The default model is **`openai/gpt-oss-20b`**, listed in Groq's [supported model
 
 With `responseFormat: 'auto'`, the built-in known strict models (`openai/gpt-oss-20b`, `openai/gpt-oss-120b`, `qwen/qwen3.8-27b`, `meta-models/muse-spark-open`) use JSON schema output. Other configured models use JSON object mode plus the same local validation. Model support can change; consult Groq's documentation before overriding it. You can explicitly select `json_schema` or `json_object` through the API.
 
-## API key setup
+## API key setup (server owner or optional direct mode)
+
+Users of a configured shared service do not need a key. These instructions apply to the service owner or users who deliberately choose direct mode.
 
 Create a key in the [Groq console](https://console.groq.com/keys), then configure `GROQ_API_KEY` locally. Never share a real key in chat, commit it, or include it in the prompt.
 
@@ -215,7 +253,7 @@ Offline `issuesFound` counts distinct triggered rules, while `issues.length` cou
 
 ### `analyzePromptAI(prompt, options?)` / `improvePrompt(prompt, options?)`
 
-Async Groq calls requiring a nonempty string and a configured key. Successful reports have `mode: 'ai'`, `scoreSource: 'ai-subjective'`, `provider`, `model`, `prompt`, `originalPrompt`, `score`, `grade`, `dimensions`, `issues`, `issuesFound`, `suggestions`, `summary`, `improvedPrompt`, `explanation`, `improvements`, and `clarificationQuestions`. AI findings use `ruleId: 'ai-evaluation'`; `issuesFound` counts findings. AI reports do not fabricate offline rule counts or deductions.
+Async AI calls requiring a nonempty string and either a shared service URL or a direct Groq key. Successful reports identify `transport` as `shared` or `direct` and have `mode: 'ai'`, `scoreSource: 'ai-subjective'`, `provider`, `model`, `prompt`, `originalPrompt`, `score`, `grade`, `dimensions`, `issues`, `issuesFound`, `suggestions`, `summary`, `improvedPrompt`, `explanation`, `improvements`, and `clarificationQuestions`. AI findings use `ruleId: 'ai-evaluation'`; `issuesFound` counts findings. AI reports do not fabricate offline rule counts or deductions.
 
 Default fallback returns the normal offline result with `requestedMode: 'ai'`, `fallbackReason`, and `warnings`. It has no AI dimensions, provider score, or rewrite. With `fallback: false`, failures reject with a sanitized `AIError` containing a stable `code`. Missing keys always reject with setup instructions.
 
@@ -247,12 +285,15 @@ AI options:
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `provider` | `groq` | Only supported provider |
-| `apiKey` | `process.env.GROQ_API_KEY` | Explicit key allowed in trusted server-side code |
+| `apiKey` | `process.env.GROQ_API_KEY` in direct mode | Explicit key selects trusted server-side direct access |
+| `serviceUrl` | `PROMPTLINT_SERVICE_URL`, then packaged URL | Shared HTTPS origin; no personal key needed |
 | `model` | `openai/gpt-oss-20b` | Configurable Groq model ID |
-| `timeoutMs` | `30000` | Integer request deadline, 1–300000 ms |
+| `timeoutMs` | `30000` direct / `120000` shared | Integer request deadline, 1–300000 ms |
 | `fallback` | `true` | Return labeled offline feedback on API failure |
 | `offlineOptions` | Offline defaults | Configuration used for fallback analysis |
 | `responseFormat` | `auto` | `auto`, `json_schema`, or `json_object` |
+
+A configured shared service takes precedence over an environment Groq key. An explicitly supplied `apiKey` selects direct mode. Set `serviceUrl: ''` or an empty `PROMPTLINT_SERVICE_URL` to disable the packaged URL for direct-mode testing. Explicit `serviceUrl` and `apiKey` cannot be combined. Shared mode rejects client model/response-format overrides; the server controls them.
 
 SDK retries are disabled to keep request count and deadlines predictable. No network request is triggered by merely importing the package or setting an API key.
 
@@ -276,11 +317,11 @@ Both modes use: 90–100 Excellent; 75–89 Good; 50–74 Needs improvement; 0�
 
 ## Privacy and API usage
 
-Offline analysis never transmits prompts. Explicit AI analysis/improvement sends only the submitted prompt plus fixed evaluation instructions/schema to Groq. Keys are used for authentication, not inserted into model messages. Only the selected file's prompt content is read for analysis; unrelated local files and environment configuration are not sent. No prompt history is saved.
+Offline analysis never transmits prompts. Shared AI sends your prompt to the configured server, which adds fixed evaluation instructions/schema and forwards it to Groq. Direct AI sends the prompt and these instructions to Groq directly. Keys are used for authentication, not inserted into model messages. Only the selected file's prompt content is read for analysis; unrelated local files and environment configuration are not sent. No prompt history is saved.
 
 The SDK endpoint is fixed to Groq and debug logging is disabled. Errors use fixed messages instead of raw provider exceptions. Prompts are treated as untrusted data in system instructions; the package executes no model-generated code. Clipboard export never uses a shell. Review prompts before choosing AI mode, and do not put secrets into prompt text.
 
-Groq AI mode needs internet access. Rate limits and charges may apply depending on your account; see [Groq rate limits](https://console.groq.com/docs/rate-limits) and your account settings. API keys belong in trusted Node.js environments, never browser bundles.
+Both Online transports need internet access. Rate limits and charges may apply depending on your account; see [Groq rate limits](https://console.groq.com/docs/rate-limits) and your account settings. API keys belong in trusted Node.js environments, never browser bundles.
 
 ## Error handling
 
@@ -299,10 +340,13 @@ try {
 
 ```text
 bin/cli.js
+server/app.js, server/index.js
+render.yaml
 src/
   index.js, analyzer.js, scoring.js, suggestions.js, formatter.js, text.js
   ai/
     groqClient.js, aiAnalyzer.js, promptImprover.js, schemas.js, aiInstructions.js
+    sharedClient.js, serviceConfig.js
   rules/
     index.js, vagueLanguage.js, missingContext.js, outputFormat.js
     contradictions.js, duplicateInstructions.js, promptLength.js
@@ -311,10 +355,11 @@ src/
 tests/
   analyzer.test.js, scoring.test.js, rules.test.js, formatter.test.js
   aiAnalyzer.test.js, promptImprover.test.js, cli.test.js, commands.test.js
+  sharedService.test.js
   fixtures/evaluation.js
 examples/
-  offline.js, groq.js, basic.js, customRules.js, cli-example.txt
-scripts/check.js
+  offline.js, groq.js, customRules.js, cli-example.txt
+scripts/check.js, scripts/configure-server.js
 package.json, package-lock.json, .env.example, .gitignore, README.md, LICENSE
 ```
 
@@ -328,9 +373,9 @@ npm run pack:check
 npm pack
 ```
 
-Automated tests require no real key and make no live AI calls. They mock the Groq client or its fetch transport, and cover scoring, false positives, invalid responses, credential-safe errors, authentication, rate limits, network failures, deadlines, fallback, menu input, exports, formatting, and CLI behavior.
+Automated tests require no real key and make no live AI calls. They mock the Groq client or its fetch transport; shared-service tests use a temporary loopback HTTP server, and cover scoring, false positives, invalid responses, credential-safe errors, authentication, rate limits, network failures, deadlines, fallback, menu input, exports, formatting, and CLI behavior.
 
-For a manual live check after configuring your own key: `node examples/groq.js`. This deliberately sends its example prompt to Groq and may incur usage. Live API behavior was not verified with credentials during development.
+For a manual live check after configuring your own key: `node examples/groq.js`. This deliberately sends its example prompt to Groq and may incur usage. Automated tests use mocked responses and do not require a real key.
 
 ## Limitations
 

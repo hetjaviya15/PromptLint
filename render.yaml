@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: promptlint-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: GROQ_API_KEY
+        sync: false
+      - key: REQUESTS_PER_MINUTE
+        value: "10"
+      - key: REQUESTS_PER_DAY
+        value: "100"
+      - key: MAX_CONCURRENT
+        value: "2"

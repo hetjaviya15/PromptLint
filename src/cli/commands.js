@@ -33,7 +33,8 @@ Options:
   --                End option parsing
 
 Run npm start in this repository, or promptlint-ai after installation.
-AI requires GROQ_API_KEY; the CLI loads local .env automatically.
+AI uses the configured shared service, or GROQ_API_KEY in direct mode.
+The CLI loads local .env automatically.
 Existing environment variables take precedence. Never paste a key into a prompt.
 Press Enter to submit an interactive prompt. Use a file for multiline text.
 Offline requires no key. AI failures return labeled offline results.

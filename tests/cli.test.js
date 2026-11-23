@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const cli = fileURLToPath(new URL('../bin/cli.js', import.meta.url));
-const run = (args, input = '') => spawnSync(process.execPath, [cli, ...args], { input, encoding: 'utf8', timeout: 10000 });
+const run = (args, input = '') => spawnSync(process.execPath, [cli, ...args], { input, encoding: 'utf8', timeout: 10000, env: { ...process.env, PROMPTLINT_SERVICE_URL: '' } });
 test('CLI human and JSON output', () => {
   const human = run(['Write good code']);
   assert.equal(human.status, 0);
@@ -46,7 +46,7 @@ test('CLI rejects invalid and conflicting arguments with stderr only', () => {
 
 test('explicit offline command stays offline even with a configured key', () => {
   const result = spawnSync(process.execPath, [cli, 'analyze', 'Explain recursion', '--offline', '--json'], {
-    env: { ...process.env, GROQ_API_KEY: 'fake-key-never-send', GROQ_BASE_URL: 'http://127.0.0.1:1' }, encoding: 'utf8'
+    env: { ...process.env, PROMPTLINT_SERVICE_URL: '', GROQ_API_KEY: 'fake-key-never-send', GROQ_BASE_URL: 'http://127.0.0.1:1' }, encoding: 'utf8'
   });
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).mode, 'offline');
@@ -54,7 +54,7 @@ test('explicit offline command stays offline even with a configured key', () => 
 });
 test('explicit AI without a key reports setup instructions with no decorative stdout', () => {
   const result = spawnSync(process.execPath, [cli, 'analyze', 'Write code', '--ai', '--json'], {
-    env: { ...process.env, GROQ_API_KEY: '' }, encoding: 'utf8'
+    env: { ...process.env, PROMPTLINT_SERVICE_URL: '', GROQ_API_KEY: '' }, encoding: 'utf8'
   });
   assert.equal(result.status, 1);
   assert.equal(result.stdout, '');

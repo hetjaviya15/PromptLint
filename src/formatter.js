@@ -12,7 +12,7 @@ export function formatReport(result, options = {}) {
   const separator = unicode ? ' · ' : ' | ';
   const source = ai ? 'AI subjective' : 'heuristic';
   const blocks = [header(),
-    `${c.cyan.bold(ai ? 'GROQ AI' : 'OFFLINE')}${separator}${c.gray(ai ? cleanText(result.model) : 'Local analysis. No API required.')}`];
+    `${c.cyan.bold(ai ? 'GROQ AI' : 'OFFLINE')}${separator}${c.gray(ai ? `${cleanText(result.model)}${result.transport === 'shared' ? ' · shared service' : ''}` : 'Local analysis. No API required.')}`];
   if (result.warnings?.length) blocks.push(panel('SERVICE NOTICE', result.warnings.map(cleanText).join('\n\n'), 'yellow'));
   const overview = [
     `${scoreColor.bold(`${result.score}/100`)} (${source})${separator}${scoreColor(cleanText(result.grade))}`,

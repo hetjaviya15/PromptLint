@@ -52,19 +52,19 @@ export async function interactivePrompt({ input = process.stdin, output = proces
       if (mode === null || mode === '0') return { command: 'cancel' };
       if (mode === '1') return await readPrompt({ command: 'analyze', ai: false });
       while (true) {
-        output.write('\n' + c.gray('Online actions send only your submitted prompt to Groq.') + '\n');
+        output.write('\n' + c.gray('Online actions send your prompt to the configured shared service and Groq, or directly to Groq when using your own key.') + '\n');
         const action = await menu('What would you like to do online?', [
           ['1', 'Analyze a prompt', 'Get scores, findings, and recommendations.'],
           ['2', 'Improve a prompt', 'Get a rewrite, explanation, and clarification questions.'],
           ['3', 'Analyze a text file', 'Evaluate a prompt from a UTF-8 file.'],
           ['4', 'Improve a text file', 'Generate a revised prompt from a UTF-8 file.'],
-          ['5', 'API setup & help', 'See how to configure your Groq key.'],
+          ['5', 'Connection & help', 'Shared access and connection troubleshooting.'],
           ['0', 'Back', 'Return to Offline / Online.']
         ]);
         if (action === null) return { command: 'cancel' };
         if (action === '0') break;
         if (action === '5') {
-          output.write('\n' + wrap('Set GROQ_API_KEY in your environment or local .env file. The CLI loads .env automatically; an existing environment variable takes precedence. Never paste a key into a prompt. If an old shell key overrides .env, run: unset GROQ_API_KEY. Online usage may be subject to Groq account limits and charges.') + '\n');
+          output.write('\n' + wrap('Shared mode uses the service URL included by the package owner; no personal API key is required. If a free server is sleeping, the first request can take about a minute. Service limits apply to all users. For a custom service, set PROMPTLINT_SERVICE_URL. Optional direct mode uses your own GROQ_API_KEY. Never paste keys into prompts.') + '\n');
           continue;
         }
         const result = { command: ['2', '4'].includes(action) ? 'improve' : 'analyze', ai: true };

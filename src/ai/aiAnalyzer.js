@@ -1,5 +1,6 @@
 import { analyzePrompt } from '../analyzer.js';
 import { configureAI, requestEvaluation, safeAIError } from './groqClient.js';
+import { requestSharedEvaluation } from './sharedClient.js';
 import { weightedScore } from './schemas.js';
 
 // Internal injection point keeps automated tests independent of a live service.
@@ -10,10 +11,13 @@ export function createAIAnalyzer(request = requestEvaluation) {
     const settings = configureAI(options);
     const offline = analyzePrompt(prompt, settings.offlineOptions);
     try {
-      const data = await request(prompt, settings);
+      const response = settings.serviceUrl
+        ? await requestSharedEvaluation(prompt, settings)
+        : { evaluation: await request(prompt, settings), model: settings.model };
+      const data = response.evaluation;
       const score = weightedScore(data.dimensions);
       const grade = score >= 90 ? 'Excellent' : score >= 75 ? 'Good' : score >= 50 ? 'Needs improvement' : 'Poor';
-      return { mode: 'ai', scoreSource: 'ai-subjective', provider: 'groq', model: settings.model,
+      return { mode: 'ai', scoreSource: 'ai-subjective', provider: 'groq', model: response.model, transport: settings.serviceUrl ? 'shared' : 'direct',
         prompt, originalPrompt: prompt, score, grade, ...data,
         issues: data.issues.map(issue => ({ ruleId: 'ai-evaluation', ...issue })), issuesFound: data.issues.length };
     } catch (error) {
