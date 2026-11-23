@@ -1,22 +1,54 @@
 {
-  "name": "promptlint-lite",
+  "name": "promptlint-ai",
   "version": "1.0.0",
-  "description": "Analyze AI prompts before sending them to an LLM. Offline, deterministic prompt linting.",
+  "description": "Analyze. Score. Improve. Offline prompt linting and optional Groq AI evaluation.",
   "type": "module",
   "main": "./src/index.js",
   "exports": "./src/index.js",
-  "bin": { "promptlint-lite": "./bin/cli.js" },
-  "files": ["src/", "bin/", "examples/", "README.md", "LICENSE"],
-  "engines": { "node": ">=24" },
+  "bin": {
+    "promptlint-ai": "./bin/cli.js"
+  },
+  "files": [
+    "src/",
+    "bin/",
+    "examples/",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
+    "start": "node bin/cli.js",
     "test": "node --test",
     "check": "node scripts/check.js",
     "pack:check": "npm pack --dry-run"
   },
-  "keywords": ["ai", "prompt", "lint", "offline", "prompt-engineering", "cli"],
+  "keywords": [
+    "ai",
+    "prompt",
+    "lint",
+    "offline",
+    "prompt-engineering",
+    "cli"
+  ],
   "author": "Het Javiya",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/hetjaviya15/PromptLint.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hetjaviya15/PromptLint.git"
+  },
   "homepage": "https://github.com/hetjaviya15/PromptLint#readme",
-  "bugs": { "url": "https://github.com/hetjaviya15/PromptLint/issues" }
+  "bugs": {
+    "url": "https://github.com/hetjaviya15/PromptLint/issues"
+  },
+  "dependencies": {
+    "boxen": "^9.0.0",
+    "chalk": "^6.0.1",
+    "groq-sdk": "^1.6.0",
+    "ora": "^10.0.0",
+    "string-width": "^8.3.0",
+    "wrap-ansi": "^10.0.2"
+  }
 }

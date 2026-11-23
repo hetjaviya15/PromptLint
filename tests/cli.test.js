@@ -32,7 +32,7 @@ test('CLI stdin, empty input, UTF-8 file and dash-prefixed positional', () => {
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 test('CLI help and version', () => {
-  assert.match(run(['--help']).stdout, /Usage: promptlint-lite/);
+  assert.match(run(['--help']).stdout, /Usage: promptlint-ai/);
   assert.equal(run(['--version']).stdout.trim(), '1.0.0');
 });
 test('CLI rejects invalid and conflicting arguments with stderr only', () => {
@@ -40,6 +40,37 @@ test('CLI rejects invalid and conflicting arguments with stderr only', () => {
     const result = run(args);
     assert.equal(result.status, 1);
     assert.equal(result.stdout, '');
-    assert.match(result.stderr, /promptlint-lite:/);
+    assert.match(result.stderr, /promptlint-ai:/);
+  }
+});
+
+test('explicit offline command stays offline even with a configured key', () => {
+  const result = spawnSync(process.execPath, [cli, 'analyze', 'Explain recursion', '--offline', '--json'], {
+    env: { ...process.env, GROQ_API_KEY: 'fake-key-never-send', GROQ_BASE_URL: 'http://127.0.0.1:1' }, encoding: 'utf8'
+  });
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).mode, 'offline');
+  assert.equal(result.stdout.includes('fake-key-never-send'), false);
+});
+test('explicit AI without a key reports setup instructions with no decorative stdout', () => {
+  const result = spawnSync(process.execPath, [cli, 'analyze', 'Write code', '--ai', '--json'], {
+    env: { ...process.env, GROQ_API_KEY: '' }, encoding: 'utf8'
+  });
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /GROQ_API_KEY/);
+});
+test('CLI rejects conflicting modes and invalid AI-only flags', () => {
+  for (const args of [['analyze', 'test', '--ai', '--offline'], ['improve', 'test', '--offline'],
+    ['analyze', 'test', '--copy'], ['analyze', 'test', '--model', 'model'], ['analyze', 'test', '--ai', '--timeout', '0']]) {
+    assert.equal(run(args).status, 1);
+  }
+  assert.equal(JSON.parse(run(['rules', '--json']).stdout).length, 8);
+});
+test('NO_COLOR and --no-color suppress ANSI output even under FORCE_COLOR', () => {
+  for (const [flags, env] of [[[], { NO_COLOR: '', FORCE_COLOR: '1' }], [['--no-color'], { FORCE_COLOR: '1' }]]) {
+    const result = spawnSync(process.execPath, [cli, 'analyze', 'Write good code', ...flags], { env: { ...process.env, ...env }, encoding: 'utf8' });
+    assert.equal(result.status, 0);
+    assert.equal(result.stdout.includes('\x1b'), false);
   }
 });

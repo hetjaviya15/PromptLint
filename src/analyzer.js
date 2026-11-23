@@ -48,7 +48,7 @@ export function analyzePrompt(prompt, options = {}) {
       .map(finding => ({ ruleId: rule.id, severity: rule.severity, ...finding }));
   });
   const issuesFound = new Set(issues.map(issue => issue.ruleId)).size;
-  return { prompt, ...calculateScore(issues, settings.weights), issues, suggestions: getSuggestions(issues),
+  return { mode: 'offline', scoreSource: 'heuristic', prompt, ...calculateScore(issues, settings.weights), issues, suggestions: getSuggestions(issues),
     summary: issuesFound ? `${issuesFound} rule(s) reported potential issues. Review the suggestions for clarity.`
       : 'No issues detected by the enabled heuristic rules.',
     rulesChecked: enabled.length, issuesFound, stats };
