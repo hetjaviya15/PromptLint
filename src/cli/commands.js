@@ -58,6 +58,7 @@ export function parseCommand(args) {
   if (values.file !== undefined && positionals.length) throw new Error('Choose either --file or a prompt argument.');
   if (values.ai && values.offline) throw new Error('Choose --ai or --offline, not both.');
   if (command === 'improve' && values.offline) throw new Error('Improvement requires AI mode; use analyze --offline for local recommendations.');
+  if (command !== 'improve' && (values.copy || values.output !== undefined)) throw new Error('--copy and --output are available only with improve.');
   const ai = command === 'improve' || values.ai === true;
   if (!ai && (values.model !== undefined || values.timeout !== undefined || values.copy || values.output !== undefined)) {
     throw new Error('--model, --timeout, --copy, and --output require AI mode.');
@@ -102,7 +103,7 @@ export async function runCLI(args, dependencies = {}) {
     for await (const chunk of input) prompt += chunk;
   } else if (prompt === undefined) throw new Error('Provide a prompt, --file PATH, or piped input. Use no arguments for the interactive menu.');
   const spinner = startProgress(ai && !values.json && Boolean(errors.isTTY) && process.env.TERM !== 'dumb'
-    && process.env.NO_COLOR === undefined && !values['no-color']);
+    && process.env.NO_COLOR === undefined && !values['no-color'], command);
   let report;
   try {
     report = ai ? await (command === 'improve' ? improve : analyzeAI)(prompt, {

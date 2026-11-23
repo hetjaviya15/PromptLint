@@ -101,3 +101,21 @@ test('shared transport sends only prompt and rejects malformed or excessive resp
     }), error => error.code === 'UNAVAILABLE');
   }
 });
+
+test('shared backend separates actions and the public API strips legacy combined responses', async t => {
+  const { selectResult } = await import('../src/ai/schemas.js');
+  const { improvePrompt } = await import('../src/ai/promptImprover.js');
+  const actions = [];
+  const { origin } = await service(t, { evaluate: async (_prompt, settings) => {
+    actions.push(settings.action);
+    return selectResult(evaluation(), settings.action);
+  } });
+  const analysis = await analyzePromptAI('Write code', { serviceUrl: origin });
+  const improvement = await improvePrompt('Write code', { serviceUrl: origin });
+  assert.deepEqual(actions, ['analyze', 'improve']);
+  assert.equal('improvedPrompt' in analysis, false);
+  assert.equal('score' in improvement, false);
+  assert.equal(improvement.action, 'improve');
+  const legacy = await service(t);
+  assert.equal('improvedPrompt' in await analyzePromptAI('Write code', { serviceUrl: legacy.origin }), false);
+});

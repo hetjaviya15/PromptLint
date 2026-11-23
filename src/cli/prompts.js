@@ -24,7 +24,7 @@ export async function interactivePrompt({ input = process.stdin, output = proces
   };
   const readPrompt = async result => {
     output.write('\n' + c.bold('Enter your prompt') + '\n');
-    output.write(wrap('Press Enter to analyze. For a multiline prompt, enter :file PATH to read a text file.') + '\n\n');
+    output.write(wrap(`Press Enter to ${result.command === 'improve' ? 'improve' : 'analyze'}. For a multiline prompt, enter :file PATH to read a text file.`) + '\n\n');
     while (true) {
       const prompt = await ask(c.cyan('Prompt: '));
       if (prompt === null) return { command: 'cancel' };

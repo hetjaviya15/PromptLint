@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { requestEvaluation, DEFAULT_MODEL } from '../src/ai/groqClient.js';
-import { evaluationSchema, matchesSchema } from '../src/ai/schemas.js';
+import { selectResult } from '../src/ai/schemas.js';
 
 // Small single-instance demo service. Quotas are shared by all users and reset on restart.
 export function createSharedServer({ apiKey, evaluate = requestEvaluation, now = Date.now,
@@ -23,6 +23,8 @@ export function createSharedServer({ apiKey, evaluate = requestEvaluation, now =
     if (Number(req.headers['content-length']) > 32768) {
       req.resume(); return send(res, 413, { error: 'Prompt request is too large.' });
     }
+    const action = req.headers['x-promptlint-action'];
+    if (action !== undefined && !['analyze', 'improve'].includes(action)) return send(res, 400, { error: 'Unknown action.' });
     let body = '', size = 0;
     try {
       req.setEncoding('utf8');
@@ -43,9 +45,9 @@ export function createSharedServer({ apiKey, evaluate = requestEvaluation, now =
       // Count attempts, including failures, so repeated errors cannot exhaust upstream usage.
       minuteCount++; dayCount++; active++;
       try {
-        const evaluation = await evaluate(payload.prompt, { apiKey: apiKey.trim(), model: DEFAULT_MODEL,
-          timeoutMs: 30000, responseFormat: 'json_schema', maxCompletionTokens: 4096 });
-        if (!matchesSchema(evaluation, evaluationSchema)) throw new Error('Invalid result');
+        const data = await evaluate(payload.prompt, { apiKey: apiKey.trim(), model: DEFAULT_MODEL,
+          action, timeoutMs: 30000, responseFormat: 'json_schema', maxCompletionTokens: 4096 });
+        const evaluation = selectResult(data, action);
         send(res, 200, { evaluation, model: DEFAULT_MODEL });
       } catch {
         // Never return provider errors, credentials, or configuration to public callers.

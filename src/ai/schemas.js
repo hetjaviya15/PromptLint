@@ -29,3 +29,19 @@ export function matchesSchema(value, schema) {
 export function weightedScore(dimensions) {
   return Math.round(Object.entries(dimensionWeights).reduce((sum, [key, weight]) => sum + dimensions[key] * weight, 0) / 100);
 }
+
+export const analysisSchema = object(Object.fromEntries(
+  ['dimensions', 'issues', 'suggestions', 'summary'].map(key => [key, evaluationSchema.properties[key]])
+));
+export const improvementSchema = object(Object.fromEntries(
+  ['improvedPrompt', 'explanation', 'improvements', 'clarificationQuestions'].map(key => [key, evaluationSchema.properties[key]])
+));
+export function schemaForAction(action) {
+  return action === 'analyze' ? analysisSchema : action === 'improve' ? improvementSchema : evaluationSchema;
+}
+export function selectResult(data, action) {
+  const schema = schemaForAction(action);
+  // Accept a complete legacy response during rolling backend upgrades, but expose only the chosen action.
+  if (!matchesSchema(data, schema) && !matchesSchema(data, evaluationSchema)) throw new Error('Invalid response schema.');
+  return Object.fromEntries(Object.keys(schema.properties).map(key => [key, data[key]]));
+}

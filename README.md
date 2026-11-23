@@ -158,7 +158,7 @@ promptlint-ai analyze --file prompt.txt --ai --json
 | `promptlint-ai` | Open the interactive menu in a terminal. |
 | `promptlint-ai analyze "..."` | Analyze a prompt offline (default). |
 | `promptlint-ai analyze "..." --ai` | Run an explicit AI evaluation. |
-| `promptlint-ai improve "..."` | Evaluate and suggest a rewritten prompt. |
+| `promptlint-ai improve "..."` | Return a rewritten prompt and explanation, without a score report. |
 | `promptlint-ai rules` | Show the available offline rules. |
 | `promptlint-ai analyze --file prompt.txt` | Read a UTF-8 prompt file. |
 | `promptlint-ai analyze "..." --json` | Return machine-readable JSON. |
@@ -167,7 +167,7 @@ promptlint-ai analyze --file prompt.txt --ai --json
 | `promptlint-ai --help` | Show CLI help. |
 | `promptlint-ai --version` | Show package version. |
 
-Other supported options include `--model`, `--timeout`, `--no-color`, and `--ascii`. Use `--ascii` for terminals without reliable Unicode support. CLI JSON output excludes decorative formatting.
+Other supported options include `--model`, `--timeout`, `--no-color`, and `--ascii`. Use `--ascii` for terminals without reliable Unicode support. CLI JSON output excludes decorative formatting. `--copy` and `--output` require the `improve` command.
 
 ## 🧩 JavaScript API
 
@@ -219,6 +219,21 @@ if (result.mode === 'ai') {
   console.log(result.warnings);
 }
 ```
+
+### Analysis and improvement are separate
+
+The selected action applies consistently to pasted prompts, files, interactive menus, JavaScript calls, and JSON output:
+
+- **Analyze:** scores, dimensions, findings, recommendations, and a summary. It does not return or display an improved prompt.
+- **Improve:** a rewritten prompt, explanation, changes, and clarification questions. It does not return or display an analysis score report.
+
+Both AI results include `mode: 'ai'`, `action`, `provider`, `model`, `transport` (`shared` or `direct`), `prompt`, and `originalPrompt`.
+
+`analyzePromptAI` adds `scoreSource`, `score`, `grade`, `dimensions`, `issues`, `issuesFound`, `suggestions`, and `summary`. `improvePrompt` adds `improvedPrompt`, `explanation`, `improvements`, and `clarificationQuestions`.
+
+If an AI request fails, default fallback returns explicitly labeled offline analysis with `requestedMode`, `requestedAction`, `fallbackReason`, and `warnings`. It never fabricates a rewrite; copy/save is unavailable. Use `fallback: false` to reject with a sanitized error instead.
+
+The shared client sends `X-PromptLint-Action` so the backend uses separate model instructions and schemas. During rolling deployments, newer clients can read legacy combined responses but discard fields unrelated to the selected action. Older clients without the header retain the legacy response contract.
 
 ### Customize linting rules
 

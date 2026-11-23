@@ -1,5 +1,5 @@
 import { AIError } from './groqClient.js';
-import { evaluationSchema, matchesSchema } from './schemas.js';
+import { selectResult } from './schemas.js';
 
 export function validateServiceUrl(value) {
   let url;
@@ -14,7 +14,7 @@ export function validateServiceUrl(value) {
 export async function requestSharedEvaluation(prompt, settings, fetchRequest = fetch) {
   try {
     const response = await fetchRequest(`${settings.serviceUrl}/v1/evaluate`, {
-      method: 'POST', headers: { 'content-type': 'application/json' },
+      method: 'POST', headers: { 'content-type': 'application/json', ...(settings.action ? { 'x-promptlint-action': settings.action } : {}) },
       // Never forward credentials, model overrides, environment data, or SDK options.
       body: JSON.stringify({ prompt }), signal: AbortSignal.timeout(settings.timeoutMs), redirect: 'error'
     });
@@ -38,9 +38,9 @@ export async function requestSharedEvaluation(prompt, settings, fetchRequest = f
       }
     } finally { await reader.cancel(); }
     const result = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-    if (!matchesSchema(result.evaluation, evaluationSchema) || typeof result.model !== 'string'
+    if (typeof result.model !== 'string'
       || !/^[a-zA-Z0-9][a-zA-Z0-9/_.-]{0,149}$/.test(result.model)) throw new Error('Invalid evaluation');
-    return { evaluation: result.evaluation, model: result.model };
+    return { evaluation: selectResult(result.evaluation, settings.action), model: result.model };
   } catch (error) {
     if (error instanceof AIError) throw error;
     if (['TimeoutError', 'AbortError'].includes(error?.name)) throw new AIError('TIMEOUT', 'The shared AI service timed out. A sleeping free server may need a minute to wake; retry shortly.');

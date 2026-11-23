@@ -1,8 +1,8 @@
 import Groq from 'groq-sdk';
 import { DEFAULT_SERVICE_URL } from './serviceConfig.js';
 import { validateServiceUrl } from './sharedClient.js';
-import { evaluationSchema, matchesSchema } from './schemas.js';
-import { aiInstructions } from './aiInstructions.js';
+import { schemaForAction, selectResult } from './schemas.js';
+import { instructionsForAction } from './aiInstructions.js';
 
 export const DEFAULT_MODEL = 'openai/gpt-oss-20b';
 const strictModels = new Set(['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'meta-models/muse-spark-open']);
@@ -49,12 +49,13 @@ export async function requestEvaluation(prompt, settings, clientFactory = create
   try {
     const useSchema = settings.responseFormat === 'json_schema'
       || (settings.responseFormat === 'auto' && strictModels.has(settings.model));
+    const schema = schemaForAction(settings.action);
     const client = clientFactory(settings);
     const request = client.chat.completions.create({
       model: settings.model,
-      messages: [{ role: 'system', content: `${aiInstructions}\nJSON schema: ${JSON.stringify(evaluationSchema)}` },
+      messages: [{ role: 'system', content: `${instructionsForAction(settings.action)}\nJSON schema: ${JSON.stringify(schema)}` },
         { role: 'user', content: prompt }],
-      response_format: useSchema ? { type: 'json_schema', json_schema: { name: 'prompt_evaluation', strict: true, schema: evaluationSchema } }
+      response_format: useSchema ? { type: 'json_schema', json_schema: { name: 'prompt_evaluation', strict: true, schema } }
         : { type: 'json_object' },
       max_completion_tokens: settings.maxCompletionTokens ?? 8192
     }, { signal: controller.signal });
@@ -71,8 +72,8 @@ export async function requestEvaluation(prompt, settings, clientFactory = create
     }
     let data;
     try { data = JSON.parse(choice.message.content); } catch { /* handled by validation below */ }
-    if (!matchesSchema(data, evaluationSchema)) throw new AIError('INVALID_RESPONSE', 'Groq returned an evaluation that did not match the expected schema. Please retry.');
-    return data;
+    try { return selectResult(data, settings.action); }
+    catch { throw new AIError('INVALID_RESPONSE', 'Groq returned a response that did not match the expected schema. Please retry.'); }
   } catch (error) {
     throw safeAIError(error);
   } finally { clearTimeout(timer); }

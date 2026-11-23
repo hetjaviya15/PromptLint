@@ -4,7 +4,7 @@ const prompt = 'Write good code for a website';
 try {
   const result = await analyzePromptAI(prompt);
   console.log(formatReport(result));
-  // Alternative: one call to improvePrompt also returns the complete evaluation.
+  // For a rewrite instead of a scoring report, call improvePrompt.
   // const improved = await improvePrompt(prompt, { provider: 'groq' });
   // if (improved.mode === 'ai') console.log(improved.improvedPrompt);
 } catch (error) { console.error(error.message); process.exitCode = 1; }

@@ -28,3 +28,17 @@ test('narrow and ASCII reports stay within width and strip terminal control inje
     assert.equal(/[╭╰█░✓]/u.test(report), false);
   }
 });
+
+test('analysis and improvement render only their own sections', async () => {
+  const { evaluation } = await import('./fixtures/evaluation.js');
+  const data = evaluation();
+  const analysis = formatReport({ ...data, mode: 'ai', action: 'analyze', score: 82, grade: 'Good', model: 'test', issues: [] });
+  assert.match(analysis, /PROMPT QUALITY/);
+  assert.doesNotMatch(analysis, /YOUR IMPROVED PROMPT|WHY THIS CHANGED|DETAILS TO CLARIFY/);
+  const improvement = formatReport({ mode: 'ai', action: 'improve', model: 'test',
+    improvedPrompt: data.improvedPrompt, explanation: data.explanation,
+    improvements: data.improvements, clarificationQuestions: data.clarificationQuestions });
+  assert.match(improvement, /YOUR IMPROVED PROMPT/);
+  assert.match(improvement, /Improvement complete/);
+  assert.doesNotMatch(improvement, /PROMPT QUALITY|SCORE BREAKDOWN|FINDINGS|Analysis complete/);
+});

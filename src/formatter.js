@@ -3,6 +3,18 @@ import { createUI, cleanText } from './cli/ui.js';
 const labels = { clarity: 'Clarity', context: 'Context', specificity: 'Specificity', outputFormat: 'Output format', consistency: 'Consistency' };
 
 export function formatReport(result, options = {}) {
+  if (result?.mode === 'ai' && result.action === 'improve') {
+    const { c, panel, wrap, unicode, section, list, header } = createUI(options);
+    const blocks = [header(), c.cyan.bold('GROQ AI · IMPROVE') + ' | ' + cleanText(result.model),
+      ...(result.warnings ?? []).map(warning => c.yellow(cleanText(warning))),
+      panel('YOUR IMPROVED PROMPT', cleanText(result.improvedPrompt), 'green'),
+      section('WHY THIS CHANGED'), wrap(cleanText(result.explanation))];
+    if (result.improvements.length) blocks.push(list(result.improvements, '+'));
+    if (result.clarificationQuestions.length) blocks.push(section('DETAILS TO CLARIFY'), list(result.clarificationQuestions, '?'));
+    blocks.push(c.gray('Review the rewrite before using it. AI can introduce assumptions.'),
+      c.green(`${unicode ? '✓' : 'OK'} Improvement complete.`));
+    return wrap(blocks.join('\n\n'));
+  }
   if (!result || !Array.isArray(result.issues) || !Number.isFinite(result.score) || typeof result.grade !== 'string') {
     throw new TypeError('formatReport expects an analysis result.');
   }
@@ -42,13 +54,7 @@ export function formatReport(result, options = {}) {
   const shown = new Set(result.issues.map(issue => issue.suggestion.trim()));
   const additional = result.suggestions.filter(item => !shown.has(item.trim()));
   if (additional.length) blocks.push(section(ai ? 'AI SUGGESTIONS' : 'RECOMMENDATIONS'), list(additional));
-  if (ai) {
-    blocks.push(panel('YOUR IMPROVED PROMPT', cleanText(result.improvedPrompt), 'green'));
-    blocks.push(section('WHY THIS CHANGED'), wrap(cleanText(result.explanation)));
-    if (result.improvements.length) blocks.push(list(result.improvements, '+'));
-    if (result.clarificationQuestions.length) blocks.push(section('DETAILS TO CLARIFY'), list(result.clarificationQuestions, '?'));
-    blocks.push(c.gray('Review the rewrite before using it. AI can introduce assumptions.'));
-  } else blocks.push(c.gray(`Score deductions: ${result.deductions.map(item => `${item.ruleId} -${item.points}`).join(', ') || 'none'}`));
+  if (!ai) blocks.push(c.gray(`Score deductions: ${result.deductions.map(item => `${item.ruleId} -${item.points}`).join(', ') || 'none'}`));
   blocks.push(section('SUMMARY'), wrap(cleanText(result.summary)),
     c.green(`${unicode ? '✓' : 'OK'} Analysis complete.`) + separator + c.gray(ai ? 'Subjective estimates, not guarantees.' : 'Heuristic scores, not guarantees.'));
   return wrap(blocks.join('\n\n'));

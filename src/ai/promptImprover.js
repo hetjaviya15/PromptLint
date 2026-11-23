@@ -1,9 +1,8 @@
-import { analyzePromptAI } from './aiAnalyzer.js';
+import { createAIAnalyzer } from './aiAnalyzer.js';
 
-export function createPromptImprover(analyze = analyzePromptAI) {
+export function createPromptImprover(improve = createAIAnalyzer(undefined, 'improve')) {
   return async function improvePrompt(prompt, options = {}) {
-    // One evaluation request returns the rewrite, its rationale, and any missing details.
-    return analyze(prompt, options);
+    return improve(prompt, options);
   };
 }
 export const improvePrompt = createPromptImprover();

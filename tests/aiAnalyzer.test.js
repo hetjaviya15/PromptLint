@@ -111,3 +111,16 @@ test('production client disables SDK logs, retries and environment endpoint over
   assert.equal(client.maxRetries, 0);
   assert.equal(client.baseURL, 'https://api.groq.com');
 });
+
+test('analysis requests an analysis-only schema and returns no rewrite fields', async () => {
+  const full = evaluation();
+  const analysis = Object.fromEntries(['dimensions', 'issues', 'suggestions', 'summary'].map(key => [key, full[key]]));
+  const result = await analyzeWith(async body => {
+    assert.equal('improvedPrompt' in body.response_format.json_schema.schema.properties, false);
+    assert.match(body.messages[0].content, /Analyze ONLY/);
+    return response(analysis);
+  })('Write code', options);
+  assert.equal(result.action, 'analyze');
+  assert.equal(result.score, 82);
+  for (const field of ['improvedPrompt', 'explanation', 'improvements', 'clarificationQuestions']) assert.equal(field in result, false);
+});
