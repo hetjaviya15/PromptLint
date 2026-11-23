@@ -13,8 +13,7 @@
     "bin/",
     "examples/",
     "README.md",
-    "LICENSE",
-    ".env.example"
+    "LICENSE"
   ],
   "engines": {
     "node": ">=24"

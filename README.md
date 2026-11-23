@@ -178,13 +178,13 @@ bash -c 'read -rsp "Groq API key: " GROQ_API_KEY; echo; export GROQ_API_KEY; nod
 
 For repeated use, set `GROQ_API_KEY` using your shell's environment configuration or a local secret manager. PowerShell users can set `$env:GROQ_API_KEY` in their session. The CLI never requests a secret interactively.
 
-Alternatively, copy `.env.example` to `.env`, fill in the key locally, and explicitly load it with Node:
+For optional local direct-mode testing, create a private `.env` containing `GROQ_API_KEY=your_key` and load it with Node:
 
 ```bash
 node --env-file=.env bin/cli.js analyze "Explain recursion" --ai
 ```
 
-`.env` and `.env.*` are ignored by Git except for the empty example. The CLI automatically loads the current directory’s `.env`; importing the library does not load environment files.
+`.env` and `.env.*` are ignored by Git. The CLI automatically loads the current directory’s `.env`; importing the library does not load environment files.
 
 ## AI prompt improvement
 
@@ -360,7 +360,7 @@ tests/
 examples/
   offline.js, groq.js, customRules.js, cli-example.txt
 scripts/check.js, scripts/configure-server.js
-package.json, package-lock.json, .env.example, .gitignore, README.md, LICENSE
+package.json, package-lock.json, .gitignore, README.md, LICENSE
 ```
 
 ## Testing
