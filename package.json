@@ -1,0 +1,22 @@
+{
+  "name": "promptlint-lite",
+  "version": "1.0.0",
+  "description": "Analyze AI prompts before sending them to an LLM. Offline, deterministic prompt linting.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": "./src/index.js",
+  "bin": { "promptlint-lite": "./bin/cli.js" },
+  "files": ["src/", "bin/", "examples/", "README.md", "LICENSE"],
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test",
+    "check": "node scripts/check.js",
+    "pack:check": "npm pack --dry-run"
+  },
+  "keywords": ["ai", "prompt", "lint", "offline", "prompt-engineering", "cli"],
+  "author": "Het Javiya",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/hetjaviya15/PromptLint.git" },
+  "homepage": "https://github.com/hetjaviya15/PromptLint#readme",
+  "bugs": { "url": "https://github.com/hetjaviya15/PromptLint/issues" }
+}
