@@ -1,64 +1,67 @@
 <div align="center">
 
-# ✦ PromptLint AI
+<img src="assets/promptlint-hero.gif" alt="Animated PromptLint AI terminal banner: analyze, score and improve prompts" width="100%" />
+
+# PromptLint AI
 
 ### Analyze. Score. Improve.
 
-**Catch weak instructions before they become weak AI responses.**
+**A practical prompt quality toolkit for developers — offline linting, optional Groq evaluation, and clearer AI prompts, all from your terminal.**
 
-A beautifully presented, developer-friendly toolkit for **linting, evaluating, and improving LLM prompts** — right from your terminal or JavaScript application.
-
-[![Node.js](https://img.shields.io/badge/Node.js-24%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-24%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ESM-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Groq](https://img.shields.io/badge/Powered%20by-Groq%20AI-F55036?style=for-the-badge)](https://groq.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-0D9488?style=for-the-badge)](LICENSE)
+[![Groq](https://img.shields.io/badge/AI-Groq-F55036?style=for-the-badge)](https://groq.com/)
+[![MIT](https://img.shields.io/badge/License-MIT-0f766e?style=for-the-badge)](LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/hetjaviya15/PromptLint?style=social)](https://github.com/hetjaviya15/PromptLint/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/hetjaviya15/PromptLint)](https://github.com/hetjaviya15/PromptLint/issues)
+[![GitHub stars](https://img.shields.io/github/stars/hetjaviya15/PromptLint?style=flat-square&logo=github)](https://github.com/hetjaviya15/PromptLint/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/hetjaviya15/PromptLint?style=flat-square)](https://github.com/hetjaviya15/PromptLint/commits/main)
+[![Issues](https://img.shields.io/github/issues/hetjaviya15/PromptLint?style=flat-square)](https://github.com/hetjaviya15/PromptLint/issues)
 
-[Features](#-features) · [Quick Start](#-quick-start) · [CLI](#-command-line-interface) · [JavaScript API](#-javascript-api) · [AI Setup](#-groq-ai-setup) · [Contributing](#-contributing)
+[**Quick Start**](#-quick-start) · [**Features**](#-features) · [**CLI**](#-command-line-interface) · [**JavaScript API**](#-javascript-api) · [**Groq Setup**](#-groq-ai--setup) · [**Contributing**](#-contributing)
 
 </div>
 
 ---
 
-## ✨ Why PromptLint AI?
+## ✨ Why PromptLint?
 
-**“Write good code.”** What language? For which application? What should the output include?
+Prompts are the inputs to AI systems, but small ambiguities can lead to unexpected results. **PromptLint AI** helps you inspect a prompt *before* sending it to a language model.
 
-LLMs can respond to vague instructions, but unclear prompts often lead to extra back-and-forth. **PromptLint AI helps you review the prompt first.** It surfaces potential issues, explains them in plain language, and offers targeted suggestions. With optional Groq AI evaluation, it can also propose a more precise version of your prompt.
+- **Offline:** deterministic, explainable JavaScript rules; no API key, no network request.
+- **Online:** optional Groq-powered evaluation, five-dimensional scoring and a suggested rewrite.
+- **Developer-friendly:** interactive terminal, JSON output, text files, and an importable Node.js API.
 
-> [!NOTE]
-> Prompt scores are **guidance, not guarantees**. Offline scoring is rule-based; AI scoring is a subjective model evaluation. A short, clear prompt can be perfectly good.
+> [!IMPORTANT]
+> Prompt scores are **review aids**, not guarantees that a model will perform better. Offline scores are heuristic and AI scores are subjective. PromptLint does not execute prompt instructions.
 
-## 🚀 Features
+## 🎯 Features
 
-| | Feature | What it does |
-|---|---|---|
-| 🔎 | **Offline prompt linting** | Checks prompts locally using eight configurable rules — no key needed. |
-| 📊 | **Quality scoring** | Shows a transparent 0–100 heuristic score and issue deductions. |
-| 🧠 | **Groq-powered evaluation** | Reviews prompts across five dimensions using an LLM. |
-| ✍️ | **Prompt improvement** | Suggests a revised prompt and explains proposed changes. |
-| 💻 | **Polished terminal UI** | Styled panels, progress bars, warnings, and loading states. |
-| 🎛️ | **Interactive CLI** | Analyze text, inspect files, or improve prompts from a menu. |
-| 🧩 | **JavaScript API** | Import the analyzer into your Node.js applications. |
-| 📄 | **Flexible output** | Structured JSON, readable reports, file export, and optional clipboard copying. |
-| 🛟 | **Explicit fallback** | When AI fails, receives clearly labeled offline feedback instead of a fake AI result. |
+| | Feature | What you get |
+|:--:|---|---|
+| 🔍 | **8 offline lint rules** | Detect vague language, some missing context, simple contradictions and more |
+| 📊 | **Explainable scores** | 0–100 heuristic score and rule-by-rule deductions |
+| 🧠 | **Groq AI evaluation** | Clarity, context, specificity, output requirements and consistency |
+| ✨ | **Prompt improvement** | Suggested rewrite, explanation, improvements and clarification questions |
+| 🖥️ | **Polished CLI** | Colored panels, score bars, progress spinner, interactive menu |
+| 📂 | **Flexible input** | Prompt arguments, UTF-8 files and piped standard input |
+| 🧰 | **Developer API** | ESM imports, custom rule settings and programmatic reports |
+| 🔒 | **Explicit online mode** | Offline by default; prompts are transmitted only when AI is selected |
+| 🧾 | **Portable outputs** | JSON, plain ASCII fallback, optional copy and file export |
 
 ## 🖥️ Terminal preview
 
-An example of the **offline** report for `Write good code`, with terminal colors omitted:
+The following is a **plain-text example based on the documented offline result** for `Write good code` (not a screenshot of a live session):
 
 ```text
-╭──────────────────────────────────────────╮
-│              PROMPTLINT AI               │
-│          Analyze. Score. Improve.        │
-╰──────────────────────────────────────────╯
+╭─────────────────────────────────────────────────────╮
+│                    PROMPTLINT                       │
+│              Analyze. Score. Improve.               │
+╰─────────────────────────────────────────────────────╯
 
-  MODE  Offline · Heuristic analysis
+  MODE  Offline • heuristic analysis
 
   PROMPT QUALITY
-  70 / 100    Needs improvement
+  70/100   Needs improvement
   ██████████████░░░░░░ 70%
 
   ⚠ vague-language
@@ -68,20 +71,20 @@ An example of the **offline** report for `Write good code`, with terminal colors
     The programming request does not specify
     a language or framework.
 
-  SCORE DEDUCTIONS
-    vague-language  -15
-    missing-context -15
+  DEDUCTIONS
+  vague-language     −15
+  missing-context    −15
+
+  ✓ Analysis complete
 ```
 
-*Illustrative layout based on the project's reported offline findings; rendering depends on terminal width and color support.*
+The real CLI adds terminal styling where supported. It also offers `--ascii` and `--no-color` for minimal or redirected output.
 
-For AI mode, PromptLint additionally shows a dimension breakdown, issues, suggestions, and an improved prompt when the model returns a valid result.
+## 🚀 Quick start
 
-## 📦 Installation
+**Requirements:** Node.js **24+** and npm.
 
-**Requirements:** Node.js **24 or newer** and npm.
-
-### Try the project from source
+### Run from the repository (works before npm publication)
 
 ```bash
 git clone https://github.com/hetjaviya15/PromptLint.git
@@ -90,157 +93,91 @@ npm ci
 npm start
 ```
 
-### Install the package
+The interactive menu lets you choose **Offline** or **Online**. Offline works without a key or an internet connection after installation.
 
-Once `promptlint-ai` is published to npm, install it globally:
+Or try a single command:
 
 ```bash
-npm install -g promptlint-ai
+node bin/cli.js analyze "Write good code" --offline
 ```
 
-Or install it in a Node.js project:
+### Install a locally packed release
 
 ```bash
-npm install promptlint-ai
-```
-
-**Before publication**, you can build and install the local package instead:
-
-```bash
+npm test
+npm run pack:check
 npm pack
 npm install -g ./promptlint-ai-1.0.0.tgz
+promptlint-ai --help
 ```
 
-> [!IMPORTANT]
-> The npm registry commands above require the package to be published. This repository's npm metadata uses `promptlint-ai`; check the registry before releasing, as a configured name does not mean publication is complete.
-
-## ⚡ Quick Start
-
-### Interactive mode
+### When the package is published to npm
 
 ```bash
+npm install -g promptlint-ai      # CLI
+# or
+npm install promptlint-ai         # Library
+```
+
+> **Publication status:** These registry installation commands apply **after** the package is published. Check [npm](https://www.npmjs.com/package/promptlint-ai) for current availability; this README does not assume it is already live.
+
+## ⚡ Command-line interface
+
+```bash
+# Interactive start
 promptlint-ai
-```
 
-Choose **Offline** for instant local checks, or **Online** for AI-powered evaluation and improvement. Online mode uses a configured shared service or your own Groq key, depending on setup.
+# Offline analysis (the default)
+promptlint-ai analyze "Write good code"
+promptlint-ai analyze --file examples/cli-example.txt --offline
 
-From the source repository, use `npm start` instead.
+# Machine-readable output
+promptlint-ai analyze "Explain recursion" --json
 
-### Analyze a prompt offline
-
-```bash
-promptlint-ai analyze "Write good code" --offline
-```
-
-### Analyze using Groq AI
-
-```bash
+# Online Groq evaluation (requires working shared service or a personal key)
 promptlint-ai analyze "Write good code" --ai
-```
 
-### Improve a prompt
-
-```bash
+# AI prompt improvement
 promptlint-ai improve "Write good code for a website"
+promptlint-ai improve --file examples/cli-example.txt --output improved.txt
+promptlint-ai improve "Write good code" --copy
+
+# Discovery and accessible output
+promptlint-ai rules
+promptlint-ai --help
+promptlint-ai --version
+promptlint-ai analyze "Write good code" --ascii --no-color
 ```
 
-### Analyze a prompt file
+Piped input is supported:
 
 ```bash
-promptlint-ai analyze --file prompt.txt --offline
-promptlint-ai analyze --file prompt.txt --ai --json
+printf 'Explain recursion' | promptlint-ai analyze --json
 ```
 
-## 🧰 Command-line interface
+**CLI behavior:** When run in a terminal with no arguments, it opens a numbered interactive menu. With redirected input, it can analyze stdin. `--json` writes machine-readable output without decorative terminal text. `--copy` requires a supported clipboard tool and `--output` saves an improved prompt to a new file (without overwriting an existing file).
 
-| Command | Action |
-|---|---|
-| `promptlint-ai` | Open the interactive menu in a terminal. |
-| `promptlint-ai analyze "..."` | Analyze a prompt offline (default). |
-| `promptlint-ai analyze "..." --ai` | Run an explicit AI evaluation. |
-| `promptlint-ai improve "..."` | Return a rewritten prompt and explanation, without a score report. |
-| `promptlint-ai rules` | Show the available offline rules. |
-| `promptlint-ai analyze --file prompt.txt` | Read a UTF-8 prompt file. |
-| `promptlint-ai analyze "..." --json` | Return machine-readable JSON. |
-| `promptlint-ai improve --file prompt.txt --output improved.txt` | Save the improved prompt to a new file. |
-| `promptlint-ai improve "..." --copy` | Copy an improved prompt, where clipboard support is available. |
-| `promptlint-ai --help` | Show CLI help. |
-| `promptlint-ai --version` | Show package version. |
+## 🧪 Offline linting
 
-Other supported options include `--model`, `--timeout`, `--no-color`, and `--ascii`. Use `--ascii` for terminals without reliable Unicode support. CLI JSON output excludes decorative formatting. `--copy` and `--output` require the `improve` command.
+Eight checks are built into the offline engine:
 
-## 🧩 JavaScript API
+| Rule ID | Severity | Detects |
+|---|---|---|
+| `empty-prompt` | Error | Empty/whitespace-only input |
+| `vague-language` | Warning | Subjective wording without clear criteria |
+| `missing-context` | Warning | Task-dependent missing context or technical details |
+| `output-format` | Info | Certain structured output requests lacking a format |
+| `contradictions` | Error | Some explicit conflicts in output, language or constraints |
+| `duplicate-instructions` | Info | Normalized repeated instructions |
+| `prompt-length` | Info | Configured size thresholds exceeded |
+| `repeated-text` | Warning | A word repeated at least eight times consecutively |
 
-PromptLint can also be used inside a Node.js application.
+Offline rules are intentionally conservative and do not understand arbitrary language semantics. Simple requests like `Translate hello into French` are not penalized merely for being short.
 
-### Offline analysis
+### Tune the checks
 
 ```js
-import { analyzePrompt, formatReport } from 'promptlint-ai';
-
-const report = analyzePrompt('Write good code');
-
-console.log(report.score); // 70 with default rules
-console.log(report.grade); // Needs improvement
-console.log(report.issues);
-console.log(formatReport(report));
-```
-
-### Groq-powered analysis
-
-```js
-import { analyzePromptAI } from 'promptlint-ai';
-
-const report = await analyzePromptAI(
-  'Write a JavaScript function that sorts an array',
-  { provider: 'groq' }
-);
-
-console.log(report.mode); // 'ai', or 'offline' if fallback was used
-console.log(report.score);
-console.log(report.suggestions);
-```
-
-### Improve a prompt with AI
-
-```js
-import { improvePrompt } from 'promptlint-ai';
-
-const result = await improvePrompt(
-  'Make a nice website',
-  { provider: 'groq' }
-);
-
-if (result.mode === 'ai') {
-  console.log(result.improvedPrompt);
-  console.log(result.explanation);
-  console.log(result.clarificationQuestions);
-} else {
-  console.log(result.warnings);
-}
-```
-
-### Analysis and improvement are separate
-
-The selected action applies consistently to pasted prompts, files, interactive menus, JavaScript calls, and JSON output:
-
-- **Analyze:** scores, dimensions, findings, recommendations, and a summary. It does not return or display an improved prompt.
-- **Improve:** a rewritten prompt, explanation, changes, and clarification questions. It does not return or display an analysis score report.
-
-Both AI results include `mode: 'ai'`, `action`, `provider`, `model`, `transport` (`shared` or `direct`), `prompt`, and `originalPrompt`.
-
-`analyzePromptAI` adds `scoreSource`, `score`, `grade`, `dimensions`, `issues`, `issuesFound`, `suggestions`, and `summary`. `improvePrompt` adds `improvedPrompt`, `explanation`, `improvements`, and `clarificationQuestions`.
-
-If an AI request fails, default fallback returns explicitly labeled offline analysis with `requestedMode`, `requestedAction`, `fallbackReason`, and `warnings`. It never fabricates a rewrite; copy/save is unavailable. Use `fallback: false` to reject with a sanitized error instead.
-
-The shared client sends `X-PromptLint-Action` so the backend uses separate model instructions and schemas. During rolling deployments, newer clients can read legacy combined responses but discard fields unrelated to the selected action. Older clients without the header retain the legacy response contract.
-
-### Customize linting rules
-
-```js
-import { analyzePrompt, getAvailableRules } from 'promptlint-ai';
-
-console.log(getAvailableRules());
+import { analyzePrompt } from 'promptlint-ai';
 
 const report = analyzePrompt('Write good code', {
   rules: {
@@ -248,55 +185,75 @@ const report = analyzePrompt('Write good code', {
     contradictions: false
   },
   maxLength: 3000,
+  maxWords: 600,
   weights: { info: 5, warning: 15, error: 30 }
 });
 
-console.log(report);
+console.log(report.score);
+console.log(report.issues);
+console.log(report.deductions);
 ```
 
-**Available exports:** `analyzePrompt`, `analyzePromptAI`, `improvePrompt`, `formatReport`, and `getAvailableRules`.
+By default, scoring starts at 100, deducts each triggered rule's severity weight once and clamps the score to 0–100. Issues and deductions provide the useful context behind any number.
 
-## 🔍 Eight offline rules
+## 🤖 Groq AI & setup
 
-| Rule | Purpose |
-|---|---|
-| `empty-prompt` | Flags empty or whitespace-only prompts. |
-| `vague-language` | Detects some subjective or imprecise wording. |
-| `missing-context` | Spots missing task context when the rule considers it relevant. |
-| `output-format` | Suggests format details for certain structured-output tasks. |
-| `contradictions` | Identifies selected directly conflicting instructions. |
-| `duplicate-instructions` | Detects repeated instructions after normalization. |
-| `prompt-length` | Checks configurable character and word limits. |
-| `repeated-text` | Flags excessive consecutive word repetition. |
+**AI mode is opt-in.** It evaluates a prompt using Groq and can generate a suggested rewritten version. It uses a configured shared service **or** a direct Groq key from a trusted Node.js environment.
 
-The checks are deliberately lightweight and do not claim full semantic understanding. For example, `Translate hello into French` should not be penalized merely because it's short.
+### Option A — Shared online service
 
-## 🧠 Groq AI setup
-
-PromptLint supports two AI connection approaches.
-
-| Mode | Groq key required from each user? | How it works |
-|---|---|---|
-| **Shared service** | No | A deployed PromptLint service forwards evaluation requests using its server-side key. |
-| **Direct Groq** | Yes | Your trusted Node.js process calls Groq using a key you configure. |
-
-**A deployed and available shared service is required for keyless online access.** The package is configured with `https://promptlint-api.onrender.com`, but availability and usage limits depend on the deployment.
-
-To use a personal Groq key in a trusted local/server environment:
-
-1. Create a key in the [Groq Console](https://console.groq.com/keys).
-2. Set the `GROQ_API_KEY` environment variable securely (never commit your key).
-3. Choose direct mode by explicitly supplying `apiKey` through the JavaScript API, or disable the packaged service URL for CLI testing.
-
-For example, in a local shell where `GROQ_API_KEY` is already configured:
+The package is configured to use `https://promptlint-api.onrender.com`. If the owner has deployed it successfully and the service has available capacity, users can choose Online mode without their own Groq key:
 
 ```bash
-PROMPTLINT_SERVICE_URL='' promptlint-ai analyze "Explain recursion" --ai
+promptlint-ai analyze "Write good code" --ai
 ```
 
-A local private `.env` can also be loaded by the CLI. **Never place a Groq key in browser-side code or the repository.** Groq requests may be subject to provider limits and charges.
+The [health endpoint](https://promptlint-api.onrender.com/health) can help check server availability, but a successful health check alone does not confirm Groq evaluation works.
 
-### AI scoring dimensions
+**Important limits:** The documented default single-instance caps are 10 attempts/minute, 100 attempts/24 hours, two simultaneous evaluations and 8,000 prompt characters. These counters are shared among all users and held in memory; they are **not a durable billing safeguard**. Hosted service availability, provider limits and charges may apply.
+
+<details>
+<summary><b>Maintainer: deploy or configure the shared service</b></summary>
+
+1. In Render, create a Blueprint from this repository using `render.yaml`, or deploy a Node web service manually.
+2. Set the server-side `GROQ_API_KEY` as a secret. Never commit it or put it into a public client.
+3. For manual setup, use the repository's documented `npm ci --omit=dev` build command, `node server/index.js` start command and `/health` health check.
+4. Verify the new server URL, then configure the client package:
+
+```bash
+npm run configure:server -- https://YOUR-SERVICE.onrender.com
+npm test
+npm pack
+```
+
+The repository also includes `npm run server` for local backend testing. Set provider-side account controls before making a shared API publicly available.
+
+</details>
+
+### Option B — Your own Groq API key
+
+Create a key at [Groq Console](https://console.groq.com/keys). In a **local, trusted Node.js environment**, configure `GROQ_API_KEY` in your shell or a private `.env` file.
+
+For a quick local test, create an untracked `.env` file in the project directory:
+
+```dotenv
+GROQ_API_KEY=replace_with_your_key
+```
+
+For direct CLI testing, disable the packaged shared URL and supply the key in the same trusted environment:
+
+```bash
+PROMPTLINT_SERVICE_URL= node bin/cli.js analyze "Explain recursion" --ai
+```
+
+The CLI loads `.env` from its current working directory. JavaScript library imports do not automatically load `.env` files. Never use a private Groq key in a browser bundle.
+
+> [!WARNING]
+> Offline mode keeps prompts local. AI mode sends the selected prompt to the configured shared service or directly to Groq. Do not include secrets in prompts sent to online analysis.
+
+## 🧠 AI quality scoring
+
+AI evaluation uses five dimensions; the app computes the weighted total from the returned dimension values.
 
 | Dimension | Weight |
 |---|---:|
@@ -306,122 +263,161 @@ A local private `.env` can also be loaded by the CLI. **Never place a Groq key i
 | Output requirements | 15% |
 | Consistency | 15% |
 
-The application calculates the final score from the model's dimension ratings. **Offline and AI scores remain separate**: they aren't blended or presented as equivalent benchmarks.
+A model's opinion is not objective accuracy. Offline and AI scores stay **separately labeled**, and failed AI calls can return clearly marked offline fallback results rather than fabricated AI scores.
 
-## 🌐 Optional shared backend
-
-The repository includes a lightweight Node.js backend and `render.yaml` for deploying a shared AI evaluation service.
-
-```text
-                       ┌───────────────────┐
-                       │    PromptLint     │
-                       │    CLI / API      │
-                       └─────────┬─────────┘
-                                 │
-                ┌────────────────┴────────────────┐
-                │                                 │
-       Offline rule engine               Online evaluation
-                │                                 │
-       Local heuristic report        Shared backend or direct Groq
-                                                  │
-                                            Groq model
-                                                  │
-                                  AI report + improved prompt
-```
-
-**Maintainer deployment:** Connect this repository to Render using its Blueprint configuration, set `GROQ_API_KEY` as a server-side secret, and confirm the `/health` endpoint works. Set the final shared URL in the package before publishing:
+## ✨ AI prompt improvement
 
 ```bash
-npm run configure:server -- https://YOUR-SERVICE.onrender.com
-npm test
-npm run pack:check
+promptlint-ai improve "Write good code for a website"
 ```
 
-The demo service uses global in-memory limits (10 attempts/minute, 100 attempts/24 hours, and 2 concurrent evaluations by default). These are **not reliable billing safeguards**: they reset after restarts and can be exhausted by unauthenticated users. For a public rollout, add stronger usage protection and enforce provider-side spending limits.
+A successful online evaluation may include an improved prompt, an explanation, a list of changes and clarification questions. Rewrite instructions ask the model to retain the user's intention and use placeholders for unknown requirements; **review all suggested rewrites** before relying on them.
 
-## 🏗️ Project structure
+## 📦 JavaScript API
+
+```js
+import {
+  analyzePrompt,
+  analyzePromptAI,
+  improvePrompt,
+  formatReport,
+  getAvailableRules
+} from 'promptlint-ai';
+
+// 1. Fully offline, synchronous
+const offline = analyzePrompt('Write good code');
+console.log(offline.score); // 70 with the current default rules
+console.log(formatReport(offline));
+
+// 2. Online, asynchronous (shared service or direct key)
+const ai = await analyzePromptAI('Create a useful portfolio website');
+console.log(ai.mode);       // 'ai' on success, 'offline' on fallback
+console.log(ai.score);
+
+// 3. Rewrite with Groq when AI is available
+const improved = await improvePrompt('Write good code for a website');
+if (improved.mode === 'ai') {
+  console.log(improved.improvedPrompt);
+} else {
+  console.log(improved.warnings);
+}
+
+// 4. Inspect supported offline rules
+console.log(getAvailableRules());
+```
+
+| Export | Purpose |
+|---|---|
+| `analyzePrompt(prompt, options?)` | Synchronous offline evaluation |
+| `analyzePromptAI(prompt, options?)` | Asynchronous AI evaluation, with labeled fallback |
+| `improvePrompt(prompt, options?)` | AI evaluation plus improved-prompt suggestion |
+| `formatReport(report, options?)` | Styled or compact report string |
+| `getAvailableRules()` | Rule metadata |
+
+For direct key use from trusted server-side code, pass an explicit `apiKey` to the AI function. For a custom shared host, use `serviceUrl`. These two explicit options cannot be combined. The documented default Groq model is `openai/gpt-oss-20b`; provider model availability may change.
+
+## 🏗️ How it works
+
+```mermaid
+flowchart TD
+    A[Prompt input] --> B{Mode}
+    B -->|Offline| C[Context-aware rule checks]
+    C --> D[Transparent deductions]
+    D --> E[Heuristic score + findings]
+    B -->|AI selected| F{Transport}
+    F -->|Shared| G[Node.js API on Render]
+    F -->|Direct| H[Groq API]
+    G --> H
+    H --> I[Validated structured evaluation]
+    I --> J[Weighted dimensions + suggested rewrite]
+    G -. Unavailable .-> K[Labeled offline fallback]
+    H -. Unavailable .-> K
+    K --> C
+    E --> L[Terminal UI / JSON / JavaScript API]
+    J --> L
+```
+
+<details>
+<summary><b>Repository layout</b></summary>
 
 ```text
 PromptLint/
-├── bin/                 # Executable CLI
+├── bin/                 # CLI entry point
 ├── src/
-│   ├── ai/              # Groq integration and shared-service client
-│   ├── cli/             # Commands, terminal UI, progress, clipboard
-│   ├── rules/           # Offline lint rules
-│   ├── analyzer.js      # Offline analysis engine
-│   ├── scoring.js       # Heuristic scoring
-│   ├── formatter.js     # Human-readable report formatting
-│   └── index.js         # Public JavaScript API
-├── server/              # Optional shared AI backend
-├── examples/            # CLI and API usage examples
-├── tests/               # Automated unit and integration tests
-├── scripts/             # Package verification / server configuration
-├── render.yaml          # Optional Render deployment config
+│   ├── ai/              # Groq, shared-client, validation, prompt improvement
+│   ├── cli/             # Commands, UI, progress, clipboard
+│   ├── rules/           # Offline lint checks
+│   ├── analyzer.js
+│   ├── scoring.js
+│   ├── formatter.js
+│   └── index.js         # Public API
+├── server/              # Optional shared Node.js API service
+├── examples/            # Example scripts and input files
+├── tests/               # Node built-in test runner
+├── scripts/             # Package checks, shared URL configuration
+├── render.yaml          # Render Blueprint
 ├── package.json
-├── README.md
-└── LICENSE
+└── README.md
 ```
 
-## 🧪 Testing and development
+</details>
+
+## 🔐 Privacy, reliability & limitations
+
+- **Offline is the default**, even when a Groq key is configured.
+- **Explicit AI mode transmits prompt text** to the selected online service.
+- No prompt history is saved by the application's documented implementation.
+- The shared service uses global, restartable in-memory limits; it has no user accounts or durable quota enforcement.
+- AI responses are validated structurally, but their judgments and rewrites can be incorrect.
+- English-language offline heuristics can miss nuanced or indirectly contradictory instructions.
+- `--copy` depends on an available OS clipboard utility.
+- If AI fails, offline fallback is explicitly labeled; it does not pretend a rewrite was generated.
+
+See the [Groq rate-limit documentation](https://console.groq.com/docs/rate-limits) for account-dependent limits.
+
+## 🧪 Development and testing
 
 ```bash
-# Install exactly the locked dependencies
 npm ci
-
-# Run automated tests (mocked AI; no real key required)
 npm test
-
-# Validate package and source configuration
 npm run check
-
-# Inspect published file contents
 npm run pack:check
-
-# Build a local npm archive
 npm pack
 ```
 
-The test suite covers lint rules, score calculations, formatting, CLI commands, simulated AI responses, fallback handling, error behavior, and shared-service functionality. Local tests do **not** need a real Groq key.
+Automated tests are designed to run without a real Groq key; AI interactions are mocked. To run an intentional live Groq check with your key configured:
 
-## 🔐 Privacy and limitations
+```bash
+node examples/groq.js
+```
 
-- **Offline prompts remain local.** Choosing AI mode sends the submitted prompt to the configured shared backend/Groq or directly to Groq.
-- **No prompt-history storage by default.** Avoid including credentials or personal secrets in prompts.
-- **Heuristic checks have limitations.** Regex-based rules can miss subtle issues or produce false positives.
-- **AI-generated rewrites should be reviewed.** A validated response format doesn't guarantee factual correctness or perfect intent preservation.
-- **Service availability is not guaranteed.** AI evaluation may be delayed, rate-limited, unavailable, or subject to usage costs.
-- **Node.js 24+ is required.** Prompt length statistics are not exact model token counts.
+That last command sends a prompt to Groq and may count toward your usage.
 
 ## 🤝 Contributing
 
-Suggestions, bug reports, and focused pull requests are welcome!
+Suggestions, issues and pull requests are welcome.
 
-1. [Open an issue](https://github.com/hetjaviya15/PromptLint/issues) to describe a bug or feature request.
-2. Fork the repository and create a feature branch.
-3. Make your changes and add tests for new behavior.
-4. Run `npm test` and `npm run check`.
-5. Open a pull request with a concise explanation.
+1. Fork the repository and create a feature branch.
+2. Keep changes small, documented and easy to understand.
+3. Add or update tests, especially for false positives and error handling.
+4. Run `npm test` before opening a pull request.
 
-Please keep test suites independent from live Groq API calls and **never commit real API keys**.
+[Open an issue](https://github.com/hetjaviya15/PromptLint/issues) · [View the source](https://github.com/hetjaviya15/PromptLint)
 
-## 📄 License
+## 📄 License & author
 
-Licensed under the [MIT License](LICENSE). © 2026 **Het Javiya**.
+Released under the [MIT License](LICENSE).
 
-## 👨‍💻 Author
-
-**Het Javiya** — Full-stack development and AI tooling enthusiast.
-
-[![GitHub](https://img.shields.io/badge/GitHub-hetjaviya15-181717?style=flat-square&logo=github)](https://github.com/hetjaviya15)
-
----
+Created by **[Het Javiya](https://github.com/hetjaviya15)**.
 
 <div align="center">
 
-### ✦ Better prompts start with better feedback.
+---
 
-**If PromptLint AI is useful, consider giving the repository a ⭐!**
+**A clearer prompt starts with a better question.**
 
-[⬆ Back to top](#-promptlint-ai)
+[![Star this repository](https://img.shields.io/badge/Star-PromptLint_AI-0e7490?style=for-the-badge&logo=github)](https://github.com/hetjaviya15/PromptLint)
+
+<sub>Built with JavaScript · Node.js · Groq · curiosity</sub>
 
 </div>
