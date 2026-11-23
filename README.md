@@ -51,7 +51,7 @@ Normal Unicode terminals show titled rounded panels, compact findings, and Unico
 
 Regular users can use Online mode without a Groq key once the owner deploys this backend and embeds its public URL in the npm package. The key stays in Render's server environment. No Docker, database, or changes to SIFRA are required.
 
-**Current state:** the backend implementation is ready; no public PromptLint service URL has been configured yet. Until you deploy it, direct mode still uses your local Groq key.
+**Shared service:** `https://promptlint-api.onrender.com` is configured as the package default. Online mode works without a personal API key. The `/health` endpoint reports availability; the base URL has no homepage. Service availability and shared usage limits apply.
 
 1. Commit and push this repository when ready. In Render, choose **New → Blueprint** and connect `hetjaviya15/PromptLint`. The included `render.yaml` selects a native Node.js Free web service.
 2. Enter **your new Groq key** as the server's `GROQ_API_KEY` secret when Render asks. Never commit a real key or place it in the public URL. Rotate any key previously shared in chat before public deployment.
